@@ -1,0 +1,23 @@
+import pubchempy as pcp
+import pandas as pd
+
+# Load your CSV file
+df = pd.read_csv(r'C:\Users\Abhay\OneDrive\Desktop\FDA_approved_drugs.csv', encoding='latin1')
+
+# Function to get SMILES for each active ingredient with timeout
+def get_smiles(ingredient_name):
+    try:
+        compounds = pcp.get_compounds(ingredient_name, 'name', timeout=60)  # Increased timeout
+        if compounds:
+            return compounds[0].isomeric_smiles
+        else:
+            return None
+    except Exception as e:
+        print(f"Error fetching {ingredient_name}: {e}")
+        return None
+
+# Apply the function to the 'Active Ingredient' column
+df['SMILES'] = df['Active Ingredient'].apply(get_smiles)
+
+# Save the result to a new CSV
+df.to_csv(r'C:\Users\Abhay\OneDrive\Desktop\FDA_approved_drugs_with_smiles.csv', index=False)
